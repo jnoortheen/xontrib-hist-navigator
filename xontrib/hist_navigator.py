@@ -1,7 +1,7 @@
 from prompt_toolkit.application import get_app
 from prompt_toolkit.filters import Condition
 
-from xonsh.ptk_shell.key_bindings import carriage_return
+from xonsh.ptk.key_bindings import carriage_return
 
 
 class _DirsHistory:
@@ -88,3 +88,5 @@ def custom_keybindings(bindings, **kw):
     @handler("escape", "right", filter=cmd_empty_prompt)
     def bind_nextd(event):
         insert_text(event, "nextd")
+
+__all__ = ('XSH_DIRS_HISTORY', )

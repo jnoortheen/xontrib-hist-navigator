@@ -10,7 +10,8 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
-xonsh = "^0.9.17"
+xonsh = ">=0.9.17"
+prompt-toolkit = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
