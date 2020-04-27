@@ -1,12 +1,17 @@
 # xontrib-hist-navigator
 
-Fish shell like `prevd` and `nextd` for [xonsh](https://github.com/xonsh/xonsh/) with keyboard shortcuts
+Fish-shell like `prevd` and `nextd` for [xonsh](https://github.com/xonsh/xonsh/) with keyboard shortcuts
 
 # Usage
 
-- install using pip
+- install using pip 
 ```sh
 pip install xontrib-hist-navigator
+```
+
+- or xpip (that is installed alongside xonsh)
+```sh
+xpip install xontrib-hist-navigator
 ```
 
 - add to list of xontribs loaded.
