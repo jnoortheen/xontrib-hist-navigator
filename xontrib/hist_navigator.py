@@ -2,7 +2,7 @@ from prompt_toolkit.application import get_app
 from prompt_toolkit.filters import Condition
 
 try:
-    from xonsh.ptk2.key_bindings import carriage_return
+    from xonsh.ptk.key_bindings import carriage_return
 except ImportError:
     from xonsh.ptk_shell.key_bindings import carriage_return
 
