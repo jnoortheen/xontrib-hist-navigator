@@ -24,3 +24,10 @@ xontrib load hist_navigator
 - it keeps track of `cd` usage per session
 - `nextd` -> move to previous working directory (`Alt + Left Arrow`)
 - `prevd` -> move to next working directory in the history (`Alt + Right Arrow`), if `prevd` is used.
+
+# Release
+
+```sh
+poetry version
+poetry publish
+```

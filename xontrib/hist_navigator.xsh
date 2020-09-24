@@ -1,6 +1,3 @@
-from prompt_toolkit.application import get_app
-from prompt_toolkit.filters import Condition
-
 try:
     from xonsh.ptk.key_bindings import carriage_return
 except ImportError:
@@ -69,6 +66,9 @@ aliases["nextd"] = _nextd  # noqa
 
 @events.on_ptk_create  # noqa
 def custom_keybindings(bindings, **kw):
+    from prompt_toolkit.application import get_app
+    from prompt_toolkit.filters import Condition
+
     handler = bindings.add
 
     @Condition
