@@ -31,15 +31,15 @@ class _DirsHistory:
         if self.history:
             self.moved = True
             item = self.history[self.cursor]
-            # @formatter:off
-            cd @ (item)  # noqa
-            # @formatter:on
+            # yapf: disable
+            cd @(item)  # noqa
+            # yapf: enable
             self.moved = False
 
     def __repr__(self):
         if self.history:
             return "<Dirs:{}-{}>".format(
-                self.history[: self.cursor + 1], self.history[self.cursor + 1 :]
+                self.history[:self.cursor + 1], self.history[self.cursor + 1:]
             )
         return "<Dirs: >"
 
@@ -83,8 +83,8 @@ def custom_keybindings(bindings, **kw):
     def cmd_empty_prompt():
         app = get_app()
         return (
-            not app.current_buffer.text
-            and app.current_buffer.document.is_cursor_at_the_end
+            not app.current_buffer.text and
+            app.current_buffer.document.is_cursor_at_the_end
         )
 
     def insert_text(event, text):
@@ -101,4 +101,4 @@ def custom_keybindings(bindings, **kw):
         insert_text(event, "nextd")
 
 
-__all__ = ("XSH_DIRS_HISTORY",)
+__all__ = ("XSH_DIRS_HISTORY", )

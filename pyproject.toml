@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xontrib-hist-navigator"
-version = "0.5.0"
+version = "0.5.1"
 description = "A Xonsh plugin to navigate between directories like fish's prevd/nextd"
 authors = ["Noortheen Raja <jnoortheen@gmail.com>"]
 
@@ -40,6 +40,7 @@ invoke = "^1.4.1"
 sh = "^1.14.0"
 clize = "^4.1.1"
 black = { version = "^20.8b1", allow-prereleases = true }
+yapf = "^0.30.0"
 
 [build-system]
 requires = ["poetry>=0.12"]
