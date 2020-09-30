@@ -1,7 +1,4 @@
-try:
-    from xonsh.ptk.key_bindings import carriage_return
-except ImportError:
-    from xonsh.ptk_shell.key_bindings import carriage_return
+from xonsh.ptk_shell.key_bindings import carriage_return
 
 
 class _DirsHistory:
@@ -9,6 +6,11 @@ class _DirsHistory:
         self.history = []
         self.cursor = -1
         self.moved = False
+
+    def _append(self, item: str):
+        if self.history and item == self.history[-1]:
+            return  # do not add same item twice in the stack
+        self.history.append(item)
 
     def add(self, old: str, new: str):
         if not self.moved:
@@ -30,14 +32,14 @@ class _DirsHistory:
             self.moved = True
             item = self.history[self.cursor]
             # @formatter:off
-            cd @(item)  # noqa
+            cd @ (item)  # noqa
             # @formatter:on
             self.moved = False
 
     def __repr__(self):
         if self.history:
             return "<Dirs:{}-{}>".format(
-                self.history[: self.cursor + 1], self.history[self.cursor + 1:]
+                self.history[: self.cursor + 1], self.history[self.cursor + 1 :]
             )
         return "<Dirs: >"
 
@@ -50,18 +52,24 @@ def _add_to_history(olddir, newdir, **kwargs):
     XSH_DIRS_HISTORY.add(olddir, newdir)
 
 
-def _prevd():
+def add_alias(func):
+    aliases[func.__name__] = func
+    return func
+
+
+@add_alias
+def prevd():
     XSH_DIRS_HISTORY.prev()
 
 
-aliases["prevd"] = _prevd  # noqa
-
-
-def _nextd():
+@add_alias
+def nextd():
     XSH_DIRS_HISTORY.next()
 
 
-aliases["nextd"] = _nextd  # noqa
+@add_alias
+def listd():
+    print(XSH_DIRS_HISTORY.history)
 
 
 @events.on_ptk_create  # noqa
@@ -75,8 +83,8 @@ def custom_keybindings(bindings, **kw):
     def cmd_empty_prompt():
         app = get_app()
         return (
-                not app.current_buffer.text
-                and app.current_buffer.document.is_cursor_at_the_end
+            not app.current_buffer.text
+            and app.current_buffer.document.is_cursor_at_the_end
         )
 
     def insert_text(event, text):
@@ -92,4 +100,5 @@ def custom_keybindings(bindings, **kw):
     def bind_nextd(event):
         insert_text(event, "nextd")
 
-__all__ = ('XSH_DIRS_HISTORY', )
+
+__all__ = ("XSH_DIRS_HISTORY",)
