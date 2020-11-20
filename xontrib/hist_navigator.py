@@ -34,9 +34,7 @@ class _DirsHistory:
         if self.history:
             self.moved = True
             item = self.history[self.cursor]
-            # yapf: disable
-            cd @ (item)  # noqa
-            # yapf: enable
+            __xonsh__.subproc_captured_stdout(['cd',item])
             self.moved = False
 
     def __repr__(self):
