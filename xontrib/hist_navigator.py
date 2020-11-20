@@ -42,7 +42,7 @@ class _DirsHistory:
     def __repr__(self):
         if self.history:
             return "<Dirs:{}-{}>".format(
-                self.history[:self.cursor + 1], self.history[self.cursor + 1:]
+                self.history[: self.cursor + 1], self.history[self.cursor + 1 :]
             )
         return "<Dirs: >"
 
@@ -50,7 +50,7 @@ class _DirsHistory:
 XSH_DIRS_HISTORY = _DirsHistory()
 
 
-@events.on_chdir  # noqa
+@builtins.events.on_chdir  # noqa
 def _add_to_history(olddir, newdir, **kwargs):
     XSH_DIRS_HISTORY.add(olddir, newdir)
 
@@ -82,8 +82,7 @@ def listd():
 def cmd_empty_prompt():
     app = builtins.__xonsh__.shell.prompter.app
     return (
-            not app.current_buffer.text and
-            app.current_buffer.document.is_cursor_at_the_end
+        not app.current_buffer.text and app.current_buffer.document.is_cursor_at_the_end
     )
 
 
@@ -93,7 +92,7 @@ def insert_text(event, text):
     carriage_return(b, event.cli)
 
 
-@events.on_ptk_create  # noqa
+@builtins.events.on_ptk_create  # noqa
 def custom_keybindings(bindings, **kw):
     handler = bindings.add
 
@@ -106,6 +105,11 @@ def custom_keybindings(bindings, **kw):
     def bind_nextd(event):
         """Equivalent to typing `nextd<enter>`"""
         insert_text(event, "nextd")
+
+    @handler("escape", "up", filter=cmd_empty_prompt)
+    def execute_version(event):
+        """cd to parent directory"""
+        insert_text(event, "cd ..")
 
 
 __all__ = ("XSH_DIRS_HISTORY",)
