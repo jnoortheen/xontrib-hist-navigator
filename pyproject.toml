@@ -16,10 +16,12 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
+    "Topic :: System :: Shells",
+    "Topic :: System :: System Shells",
+    "Topic :: Terminals",
     "Programming Language :: Python",
     "Topic :: Utilities",
-    "Topic :: Software Development :: Libraries",
-    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
@@ -27,7 +29,7 @@ classifiers = [
 ]
 
 
-packages = [{ include = "xontrib/*.xsh" }]
+packages = [{ include = "xontrib" }]
 
 [tool.poetry.dependencies]
 python = ">=3.6"

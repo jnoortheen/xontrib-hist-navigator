@@ -1,3 +1,6 @@
+import builtins
+
+from prompt_toolkit.filters import Condition
 from xonsh.ptk_shell.key_bindings import carriage_return
 
 
@@ -32,7 +35,7 @@ class _DirsHistory:
             self.moved = True
             item = self.history[self.cursor]
             # yapf: disable
-            cd @(item)  # noqa
+            cd @ (item)  # noqa
             # yapf: enable
             self.moved = False
 
@@ -53,52 +56,56 @@ def _add_to_history(olddir, newdir, **kwargs):
 
 
 def add_alias(func):
-    aliases[func.__name__] = func
+    builtins.aliases[func.__name__] = func
     return func
 
 
 @add_alias
 def prevd():
+    """Move to previous directory in the cd-history"""
     XSH_DIRS_HISTORY.prev()
 
 
 @add_alias
 def nextd():
+    """Move to next directory in the cd-history"""
     XSH_DIRS_HISTORY.next()
 
 
 @add_alias
 def listd():
+    """List directories in cd-history"""
     print(XSH_DIRS_HISTORY.history)
+
+
+@Condition
+def cmd_empty_prompt():
+    app = builtins.__xonsh__.shell.prompter.app
+    return (
+            not app.current_buffer.text and
+            app.current_buffer.document.is_cursor_at_the_end
+    )
+
+
+def insert_text(event, text):
+    b = event.current_buffer
+    b.insert_text(text)
+    carriage_return(b, event.cli)
 
 
 @events.on_ptk_create  # noqa
 def custom_keybindings(bindings, **kw):
-    from prompt_toolkit.application import get_app
-    from prompt_toolkit.filters import Condition
-
     handler = bindings.add
-
-    @Condition
-    def cmd_empty_prompt():
-        app = get_app()
-        return (
-            not app.current_buffer.text and
-            app.current_buffer.document.is_cursor_at_the_end
-        )
-
-    def insert_text(event, text):
-        b = event.current_buffer
-        b.insert_text(text)
-        carriage_return(b, event.cli)
 
     @handler("escape", "left", filter=cmd_empty_prompt)
     def bind_prevd(event):
+        """Equivalent to typing `prevd<enter>`"""
         insert_text(event, "prevd")
 
     @handler("escape", "right", filter=cmd_empty_prompt)
     def bind_nextd(event):
+        """Equivalent to typing `nextd<enter>`"""
         insert_text(event, "nextd")
 
 
-__all__ = ("XSH_DIRS_HISTORY", )
+__all__ = ("XSH_DIRS_HISTORY",)
