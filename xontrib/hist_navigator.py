@@ -18,8 +18,8 @@ class _DirsHistory:
     def add(self, old: str, new: str):
         if not self.moved:
             if not self.history:
-                self.history.append(old)
-            self.history.append(new)
+                self._append(old)
+            self._append(new)
             self.cursor = len(self.history) - 1
 
     def prev(self):
@@ -91,7 +91,7 @@ def insert_text(event, text):
 
 
 @builtins.events.on_ptk_create  # noqa
-def custom_keybindings(bindings, **kw):
+def custom_keybindings(bindings, **_):
     handler = bindings.add
 
     @handler("escape", "left", filter=cmd_empty_prompt)
