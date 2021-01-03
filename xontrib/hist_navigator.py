@@ -1,7 +1,6 @@
 import builtins
 
 from prompt_toolkit.filters import Condition
-from xonsh.ptk_shell.key_bindings import carriage_return
 
 
 class _DirsHistory:
@@ -34,7 +33,7 @@ class _DirsHistory:
         if self.history:
             self.moved = True
             item = self.history[self.cursor]
-            __xonsh__.subproc_captured_stdout(['cd',item])
+            __xonsh__.subproc_captured_stdout(["cd", item])
             self.moved = False
 
     def __repr__(self):
@@ -85,6 +84,8 @@ def cmd_empty_prompt():
 
 
 def insert_text(event, text):
+    from xonsh.ptk_shell.key_bindings import carriage_return
+
     b = event.current_buffer
     b.insert_text(text)
     carriage_return(b, event.cli)
