@@ -1,6 +1,5 @@
-import builtins
-
 from prompt_toolkit.filters import Condition
+from xonsh.built_ins import XSH
 
 
 class _DirsHistory:
@@ -33,7 +32,7 @@ class _DirsHistory:
         if self.history:
             self.moved = True
             item = self.history[self.cursor]
-            __xonsh__.subproc_captured_stdout(["cd", item])
+            XSH.subproc_captured_stdout(["cd", item])
             self.moved = False
 
     def __repr__(self):
@@ -47,13 +46,13 @@ class _DirsHistory:
 XSH_DIRS_HISTORY = _DirsHistory()
 
 
-@builtins.events.on_chdir  # noqa
+@XSH.builtins.events.on_chdir  # noqa
 def _add_to_history(olddir, newdir, **kwargs):
     XSH_DIRS_HISTORY.add(olddir, newdir)
 
 
 def add_alias(func):
-    builtins.aliases[func.__name__] = func
+    XSH.aliases[func.__name__] = func
     return func
 
 
@@ -77,7 +76,7 @@ def listd():
 
 @Condition
 def cmd_empty_prompt():
-    app = builtins.__xonsh__.shell.prompter.app
+    app = XSH.shell.prompter.app
     return (
         not app.current_buffer.text and app.current_buffer.document.is_cursor_at_the_end
     )
@@ -91,7 +90,7 @@ def insert_text(event, text):
     carriage_return(b, event.cli)
 
 
-@builtins.events.on_ptk_create  # noqa
+@XSH.builtins.events.on_ptk_create  # noqa
 def custom_keybindings(bindings, **_):
     handler = bindings.add
 
