@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xontrib-hist-navigator"
-version = "0.6.3"
+version = "0.6.4"
 description = "A Xonsh plugin to navigate between directories like fish's prevd/nextd"
 authors = ["Noortheen Raja <jnoortheen@gmail.com>"]
 
