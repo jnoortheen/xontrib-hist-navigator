@@ -1,9 +1,14 @@
 import re
 import typing
+import threading
 from pathlib import Path
 from prompt_toolkit.filters import Condition
 from xonsh.built_ins import XSH
 from prompt_toolkit.keys import ALL_KEYS
+from xonsh.style_tools import partial_color_tokenize
+from prompt_toolkit.formatted_text import PygmentsTokens
+from xonsh.ptk_shell.shell import tokenize_ansi
+from xonsh.tools import print_color
 
 envx = XSH.env or {}
 cdx = XSH.aliases["cd"]
@@ -80,14 +85,12 @@ def listd():
     print(XSH_DIRS_HISTORY.history)
 
 
-from xonsh.style_tools import partial_color_tokenize
-from prompt_toolkit.formatted_text import PygmentsTokens
-from xonsh.ptk_shell.shell import tokenize_ansi
 def _p_msg_fmt(s):
-    return tokenize_ansi(PygmentsTokens(partial_color_tokenize(XSH.shell.shell.prompt_formatter(s))))
+    return tokenize_ansi(PygmentsTokens(partial_color_tokenize(XSH.shell.shell.prompt_formatter(s)))) # noqa
 
-import threading
-def _update_prompt(): # force-update all 3 prompts (if exist) to the newer values. Helpful when xontrib changes some prompt variables in the background and doesn't want to wait for the next prompt cycle
+def _update_prompt(): # force-update all 3 prompts (if exist) to new values
+    # Helpful when xontrib changes prompt vars in the background and
+    # doesn't want to wait for the next prompt cycle
     shellx = XSH.shell.shell
     shellx.prompt_formatter.fields.reset() # reset fields cache
     if prompt_l := envx['PROMPT']:
@@ -175,12 +178,12 @@ def custom_keybindings(bindings, **_):
 
         key_user = envx.get(     key_user_var, None)
         key_def  = _default_keys[key_user_var]
-        if   key_user == None:     # doesn't exist       → use default
+        if   key_user is None:     # doesn't exist       → use default
             if type(key_def) == list:
                 return bind_add(*key_def, filter=filter)
             else:
                 return bind_add( key_def, filter=filter)
-        elif key_user == False:    # exists and disabled → don't bind
+        elif key_user is False:    # exists and disabled → don't bind
             return skip
         elif type(key_user) == str:# remove whitespace
             key_user = re_despace.sub('',key_user)
@@ -201,8 +204,12 @@ def custom_keybindings(bindings, **_):
             all(k in ALL_KEYS or _parse_key(k) for k in key_user):
             return bind_add(*key_user, filter=filter)
         else:                      # exists and invalid  → use default
-            print_color("{BLUE}xontrib-hist_navigator:{RESET} your "+key_user_var+" '{BLUE}"+str(key_user)+"{RESET}' is {RED}invalid{RESET}; "+\
-              "using the default '{BLUE}"+str(key_def)+"{RESET}'; run ↓ to see the allowed list\nfrom prompt_toolkit.keys import ALL_KEYS; print(ALL_KEYS)")
+            print_color("{BLUE}xontrib-hist_navigator:{RESET} your "+\
+                key_user_var+" '{BLUE}"+str(key_user)+\
+                "{RESET}' is {RED}invalid{RESET}; "+\
+              "using the default '{BLUE}"+str(key_def)+\
+              "{RESET}'; run ↓ to see the allowed list\n"+\
+              "from prompt_toolkit.keys import ALL_KEYS; print(ALL_KEYS)")
             if type(key_def) == list:
                 return bind_add(*key_def, filter=filter)
             else:
