@@ -38,7 +38,7 @@ class _DirsHistory:
         if self.history:
             self.moved = True
             item = self.history[self.cursor]
-            XSH.subproc_captured_stdout(["cd", item])
+            _cd_inline(item)
             self.moved = False
 
     def __repr__(self):
@@ -215,13 +215,13 @@ def custom_keybindings(bindings, **_):
 
     @handler("X_HISTNAV_KEY_PREV", filter=_filter)
     def bind_prevd(event):
-        """Equivalent to typing `prevd<enter>`"""
-        insert_text(event, "prevd")
+        """cd to `prevd`"""
+        prevd()
 
     @handler("X_HISTNAV_KEY_NEXT", filter=_filter)
     def bind_nextd(event):
-        """Equivalent to typing `nextd<enter>`"""
-        insert_text(event, "nextd")
+        """cd to `nextd`"""
+        nextd()
 
     @handler("X_HISTNAV_KEY_UP", filter=_filter)
     def execute_version(event):
