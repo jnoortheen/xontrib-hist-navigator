@@ -85,6 +85,11 @@ def cmd_empty_prompt():
     )
 
 
+@Condition
+def key_always():
+    """Always activate key binding"""
+    return True
+
 def insert_text(event, text):
     from xonsh.ptk_shell.key_bindings import carriage_return
 
@@ -158,17 +163,22 @@ def custom_keybindings(bindings, **_):
             else:
                 return bind_add( key_def, filter=filter)
 
-    @handler("X_HISTNAV_KEY_PREV", filter=cmd_empty_prompt)
+    if envx.get("X_HISTNAV_EMPTY_PROMPT", ""):
+        _filter = cmd_empty_prompt
+    else:
+        _filter = key_always
+
+    @handler("X_HISTNAV_KEY_PREV", filter=_filter)
     def bind_prevd(event):
         """Equivalent to typing `prevd<enter>`"""
         insert_text(event, "prevd")
 
-    @handler("X_HISTNAV_KEY_NEXT", filter=cmd_empty_prompt)
+    @handler("X_HISTNAV_KEY_NEXT", filter=_filter)
     def bind_nextd(event):
         """Equivalent to typing `nextd<enter>`"""
         insert_text(event, "nextd")
 
-    @handler("X_HISTNAV_KEY_UP", filter=cmd_empty_prompt)
+    @handler("X_HISTNAV_KEY_UP", filter=_filter)
     def execute_version(event):
         """cd to parent directory"""
         insert_text(event, "cd ..")
