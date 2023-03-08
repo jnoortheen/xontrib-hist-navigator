@@ -28,8 +28,8 @@ xontrib load hist_navigator
 
 | command | description                                                        | shortcut          |
 | ------- | ------------------------------------------------------------------ | ----------------- |
-| nextd   | move to previous working directory                                 | Alt + Left Arrow  |
-| prevd   | move to next working directory in the history (if `prevd` is used) | Alt + Right Arrow |
+| prevd   | move to previous working directory                                 | Alt + Left Arrow  |
+| nextd   | move to next working directory in the history (if `prevd` is used) | Alt + Right Arrow |
 | listd   | list cd history                                                    |                   |
 | cd ..   | move to parent directory                                           | Alt + Up Arrow    |
 
