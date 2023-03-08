@@ -1,9 +1,12 @@
 import re
+import typing
+from pathlib import Path
 from prompt_toolkit.filters import Condition
 from xonsh.built_ins import XSH
 from prompt_toolkit.keys import ALL_KEYS
 
 envx = XSH.env or {}
+cdx = XSH.aliases["cd"]
 
 class _DirsHistory:
     def __init__(self):
@@ -77,6 +80,28 @@ def listd():
     print(XSH_DIRS_HISTORY.history)
 
 
+from xonsh.style_tools import partial_color_tokenize
+from prompt_toolkit.formatted_text import PygmentsTokens
+from xonsh.ptk_shell.shell import tokenize_ansi
+def _p_msg_fmt(s):
+    return tokenize_ansi(PygmentsTokens(partial_color_tokenize(XSH.shell.shell.prompt_formatter(s))))
+
+import threading
+def _update_prompt(): # force-update all 3 prompts (if exist) to the newer values. Helpful when xontrib changes some prompt variables in the background and doesn't want to wait for the next prompt cycle
+    shellx = XSH.shell.shell
+    shellx.prompt_formatter.fields.reset() # reset fields cache
+    if prompt_l := envx['PROMPT']:
+        prompt_l = prompt_l() if callable(prompt_l) else prompt_l
+        shellx.prompter.message        = _p_msg_fmt(prompt_l)
+    if prompt_r := envx['RIGHT_PROMPT']:
+        prompt_r = prompt_r() if callable(prompt_r) else prompt_r
+        shellx.prompter.rprompt        = _p_msg_fmt(prompt_r)
+    if prompt_b := envx['BOTTOM_TOOLBAR']:
+        prompt_b = prompt_b() if callable(prompt_b) else prompt_b
+        shellx.prompter.bottom_toolbar = _p_msg_fmt(prompt_b)
+    shellx.prompter.app.invalidate()      # send signal that prompt needs update
+
+
 @Condition
 def cmd_empty_prompt():
     app = XSH.shell.prompter.app
@@ -96,6 +121,26 @@ def insert_text(event, text):
     b = event.current_buffer
     b.insert_text(text)
     carriage_return(b, event.cli)
+
+
+def _cd_inline(path: typing.Optional[typing.AnyStr] = None) -> None:
+    """Change dir without creating a new prompt line, updating existing instead"""
+
+    if path is None:
+        args = []
+    elif isinstance(path, bytes):
+        args = [path.decode("utf-8")]
+    elif isinstance(path, str):
+        args = [path]
+    if         path and \
+      not Path(path).is_dir():
+        return # do nothing is target is not a Dir
+    _, exc, _ = cdx(args)
+    if exc is not None:
+        raise Exception(exc)
+    else:
+        t = threading.Thread(target=_update_prompt, args=())
+        t.start()
 
 
 @XSH.builtins.events.on_ptk_create  # noqa
@@ -181,7 +226,7 @@ def custom_keybindings(bindings, **_):
     @handler("X_HISTNAV_KEY_UP", filter=_filter)
     def execute_version(event):
         """cd to parent directory"""
-        insert_text(event, "cd ..")
+        _cd_inline('..')
 
 
 __all__ = ("XSH_DIRS_HISTORY",)
