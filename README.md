@@ -35,14 +35,14 @@ xontribs = [ "hist_navigator", # Initializes hist_navigator (fish-shell-like dir
 # ↓ optional configuration variables (use `False` to disable a keybind)
 if 'hist_navigator' in xontribs: # configure xontrib only if it's loaded
   # config var                 value  |default|alt_cmd¦ comment
-  envx["X_HISTNAV_KEY_PREV"] = "⎇←"  #|['escape','left' ]|False¦ Move to the previous working directory
-  envx["X_HISTNAV_KEY_NEXT"] = "⎇→"  #|['escape','right']|False¦ Move to the next working directory in the history (if 'prevd' was used)
-  envx["X_HISTNAV_KEY_UP"]   = "⎇↑"  #|['escape','up'   ]|False¦ Move to the parent directory
+  envx["XSH_HISTNAV_KEY_PREV"] = "⎇←"  #|['escape','left' ]|False¦ Move to the previous working directory
+  envx["XSH_HISTNAV_KEY_NEXT"] = "⎇→"  #|['escape','right']|False¦ Move to the next working directory in the history (if 'prevd' was used)
+  envx["XSH_HISTNAV_KEY_UP"]   = "⎇↑"  #|['escape','up'   ]|False¦ Move to the parent directory
   # run to see the allowed list for ↑: from prompt_toolkit.keys import ALL_KEYS; print(ALL_KEYS)
   # Alt is also supported as either of: a- ⎇ ⌥ (converted to a prefix 'escape')
   # Control symbols are also supported as either of: ⎈ ⌃
   # Arrow key symbols are also supported as either of: ▼▲◀▶ ↓↑←→
-  envx["X_HISTNAV_EMPTY_PROMPT"] = False #|True|False¦ Keybinds only work in an empty prompt
+  envx["XSH_HISTNAV_EMPTY_PROMPT"] = False #|True|False¦ Keybinds only work in an empty prompt
 
 xontribs_load(xontribs) # actually load all xontribs in the list
 ```
@@ -51,7 +51,7 @@ xontribs_load(xontribs) # actually load all xontribs in the list
 ```xsh
 xontrib load hist_navigator
 # configure like in the example above, but replace envx['VAR'] with $VAR
-$X_HISTNAV_KEY_PREV	= "⎇←" # ...
+$XSH_HISTNAV_KEY_PREV	= "⎇←" # ...
 ```
 
 # Overview

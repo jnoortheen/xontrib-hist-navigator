@@ -153,9 +153,9 @@ def custom_keybindings(bindings, **_):
     re_despace = re.compile(r'\s', re.IGNORECASE)
 
     _default_keys = {
-        "X_HISTNAV_KEY_PREV" : ['escape','left' ],
-        "X_HISTNAV_KEY_NEXT" : ['escape','right'],
-        "X_HISTNAV_KEY_UP"   : ['escape','up'   ],
+        "XSH_HISTNAV_KEY_PREV" : ['escape','left' ],
+        "XSH_HISTNAV_KEY_NEXT" : ['escape','right'],
+        "XSH_HISTNAV_KEY_UP"   : ['escape','up'   ],
     }
 
     _key_symb = {
@@ -215,22 +215,22 @@ def custom_keybindings(bindings, **_):
             else:
                 return bind_add( key_def, filter=filter)
 
-    if envx.get("X_HISTNAV_EMPTY_PROMPT", ""):
+    if envx.get("XSH_HISTNAV_EMPTY_PROMPT", ""):
         _filter = cmd_empty_prompt
     else:
         _filter = key_always
 
-    @handler("X_HISTNAV_KEY_PREV", filter=_filter)
+    @handler("XSH_HISTNAV_KEY_PREV", filter=_filter)
     def bind_prevd(event):
         """cd to `prevd`"""
         prevd()
 
-    @handler("X_HISTNAV_KEY_NEXT", filter=_filter)
+    @handler("XSH_HISTNAV_KEY_NEXT", filter=_filter)
     def bind_nextd(event):
         """cd to `nextd`"""
         nextd()
 
-    @handler("X_HISTNAV_KEY_UP", filter=_filter)
+    @handler("XSH_HISTNAV_KEY_UP", filter=_filter)
     def execute_version(event):
         """cd to parent directory"""
         _cd_inline('..')
