@@ -191,24 +191,17 @@ def custom_keybindings(bindings, **_):
         "XSH_HISTNAV_KEY_UP"   : ['escape','up'   ],
     }
 
-    is_ptk = _is_ptk()
-
     def handler(key_user_var, filter):
         def skip(func):
           pass
-
-        if is_ptk:
-            bind_add = bindings.add
-        else:
-            bind_add = bindings.registry.add_binding
 
         key_user = envx.get(     key_user_var, None)
         key_def  = _default_keys[key_user_var]
         if   key_user is None:     # doesn't exist       → use default
             if type(key_def) == list:
-                return bind_add(*key_def, filter=filter)
+                return bindings.add(*key_def, filter=filter)
             else:
-                return bind_add( key_def, filter=filter)
+                return bindings.add( key_def, filter=filter)
         elif key_user is False:    # exists and disabled → don't bind
             return skip
         elif type(key_user) == str:# remove whitespace
@@ -218,10 +211,10 @@ def custom_keybindings(bindings, **_):
 
         if   type(key_user) == str  and\
              key_user in ALL_KEYS: # exists and   valid  → use it
-            return bind_add(key_user, filter=filter)
+            return bindings.add(key_user, filter=filter)
         elif type(key_user) == list and\
             all(k in ALL_KEYS or _parse_key(k) for k in key_user):
-            return bind_add(*key_user, filter=filter)
+            return bindings.add(*key_user, filter=filter)
         else:                      # exists and invalid  → use default
             print_color("{BLUE}xontrib-hist_navigator:{RESET} your "+\
                 key_user_var+" '{BLUE}"+str(key_user)+\
@@ -230,45 +223,29 @@ def custom_keybindings(bindings, **_):
               "{RESET}'; run ↓ to see the allowed list\n"+\
               "from prompt_toolkit.keys import ALL_KEYS; print(ALL_KEYS)")
             if type(key_def) == list:
-                return bind_add(*key_def, filter=filter)
+                return bindings.add(*key_def, filter=filter)
             else:
-                return bind_add( key_def, filter=filter)
+                return bindings.add( key_def, filter=filter)
 
     if envx.get("XSH_HISTNAV_EMPTY_PROMPT", ""):
         _filter = cmd_empty_prompt
     else:
         _filter = key_always
 
-    if is_ptk:
-        @handler("XSH_HISTNAV_KEY_PREV", filter=_filter)
-        def bind_prevd(event):
-            """cd to `prevd`"""
-            prevd()
+    @handler("XSH_HISTNAV_KEY_PREV", filter=_filter)
+    def bind_prevd(event):
+        """cd to `prevd`"""
+        prevd()
 
-        @handler("XSH_HISTNAV_KEY_NEXT", filter=_filter)
-        def bind_nextd(event):
-            """cd to `nextd`"""
-            nextd()
+    @handler("XSH_HISTNAV_KEY_NEXT", filter=_filter)
+    def bind_nextd(event):
+        """cd to `nextd`"""
+        nextd()
 
-        @handler("XSH_HISTNAV_KEY_UP", filter=_filter)
-        def execute_version(event):
-            """cd to parent directory"""
-            _cd_inline('..')
-    else:
-        @handler("XSH_HISTNAV_KEY_PREV", filter=_filter)
-        def bind_prevd(event):
-            """Type `prevd⏎`"""
-            insert_text(event, "prevd")
-
-        @handler("XSH_HISTNAV_KEY_NEXT", filter=_filter)
-        def bind_nextd(event):
-            """Type `nextd⏎`"""
-            insert_text(event, "nextd")
-
-        @handler("XSH_HISTNAV_KEY_UP", filter=_filter)
-        def execute_version(event):
-            """Type `cd ..`"""
-            insert_text(event, "cd ..")
+    @handler("XSH_HISTNAV_KEY_UP", filter=_filter)
+    def execute_version(event):
+        """cd to parent directory"""
+        _cd_inline('..')
 
 
 __all__ = ("XSH_DIRS_HISTORY",)
