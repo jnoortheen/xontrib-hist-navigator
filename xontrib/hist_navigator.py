@@ -18,6 +18,7 @@ class _DirsHistory:
         self.history = []
         self.cursor = -1
         self.moved = False
+        self.is_ptk = None
 
     def _append(self, item: str):
         if self.history and item == self.history[-1]:
@@ -43,7 +44,12 @@ class _DirsHistory:
         if self.history:
             self.moved = True
             item = self.history[self.cursor]
-            _cd_inline(item)
+            if self.is_ptk is None:
+                self.is_ptk = _is_ptk()
+            if self.is_ptk:
+                _cd_inline(item)
+            else:
+                XSH.subproc_captured_stdout(["cd", item])
             self.moved = False
 
     def __repr__(self):
@@ -174,11 +180,13 @@ def custom_keybindings(bindings, **_):
     }
     _alts = ['a-','⌥','⎇']
 
+    is_ptk = _is_ptk()
+
     def handler(key_user_var, filter):
         def skip(func):
           pass
 
-        if envx.get('SHELL_TYPE') in ["prompt_toolkit", "prompt_toolkit2"]:
+        if is_ptk:
             bind_add = bindings.add
         else:
             bind_add = bindings.registry.add_binding
@@ -227,20 +235,36 @@ def custom_keybindings(bindings, **_):
     else:
         _filter = key_always
 
-    @handler("XSH_HISTNAV_KEY_PREV", filter=_filter)
-    def bind_prevd(event):
-        """cd to `prevd`"""
-        prevd()
+    if is_ptk:
+        @handler("XSH_HISTNAV_KEY_PREV", filter=_filter)
+        def bind_prevd(event):
+            """cd to `prevd`"""
+            prevd()
 
-    @handler("XSH_HISTNAV_KEY_NEXT", filter=_filter)
-    def bind_nextd(event):
-        """cd to `nextd`"""
-        nextd()
+        @handler("XSH_HISTNAV_KEY_NEXT", filter=_filter)
+        def bind_nextd(event):
+            """cd to `nextd`"""
+            nextd()
 
-    @handler("XSH_HISTNAV_KEY_UP", filter=_filter)
-    def execute_version(event):
-        """cd to parent directory"""
-        _cd_inline('..')
+        @handler("XSH_HISTNAV_KEY_UP", filter=_filter)
+        def execute_version(event):
+            """cd to parent directory"""
+            _cd_inline('..')
+    else:
+        @handler("XSH_HISTNAV_KEY_PREV", filter=_filter)
+        def bind_prevd(event):
+            """Type `prevd⏎`"""
+            insert_text(event, "prevd")
+
+        @handler("XSH_HISTNAV_KEY_NEXT", filter=_filter)
+        def bind_nextd(event):
+            """Type `nextd⏎`"""
+            insert_text(event, "nextd")
+
+        @handler("XSH_HISTNAV_KEY_UP", filter=_filter)
+        def execute_version(event):
+            """Type `cd ..`"""
+            insert_text(event, "cd ..")
 
 
 __all__ = ("XSH_DIRS_HISTORY",)
