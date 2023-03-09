@@ -159,6 +159,26 @@ def _cd_inline(path: typing.Optional[typing.AnyStr] = None) -> None:
         t.start()
 
 
+def _parse_key_user(key_user):
+    _key_symb = {
+        '⎈':'c-'  ,'⌃':'c-'   ,
+        '▼':'down' ,'↓':'down' ,
+        '▲':'up'   ,'↑':'up'   ,
+        '◀':'left' ,'←':'left' ,
+        '▶':'right','→':'right',
+    }
+    _alts = ['a-','⌥','⎇']
+
+    for k,v in _key_symb.items(): # replace symbols
+        if k in key_user: # replace other keys
+            key_user = key_user.replace(k,v)
+    for alt in _alts:
+        if alt in key_user: # replace alt with an ⎋ sequence of keys
+            key_user = ['escape', key_user.replace(alt,'')]
+            break
+
+    return key_user
+
 @XSH.builtins.events.on_ptk_create  # noqa
 def custom_keybindings(bindings, **_):
     from prompt_toolkit.key_binding.key_bindings import _parse_key
@@ -170,15 +190,6 @@ def custom_keybindings(bindings, **_):
         "XSH_HISTNAV_KEY_NEXT" : ['escape','right'],
         "XSH_HISTNAV_KEY_UP"   : ['escape','up'   ],
     }
-
-    _key_symb = {
-        '⎈':'c-'  ,'⌃':'c-'   ,
-        '▼':'down' ,'↓':'down' ,
-        '▲':'up'   ,'↑':'up'   ,
-        '◀':'left' ,'←':'left' ,
-        '▶':'right','→':'right',
-    }
-    _alts = ['a-','⌥','⎇']
 
     is_ptk = _is_ptk()
 
@@ -203,14 +214,7 @@ def custom_keybindings(bindings, **_):
         elif type(key_user) == str:# remove whitespace
             key_user = re_despace.sub('',key_user)
 
-        for k,v in _key_symb.items(): # replace symbols
-            if k in key_user: # replace other keys
-                key_user = key_user.replace(k,v)
-                break
-        for alt in _alts:
-            if alt in key_user: # replace alt with an ⎋ sequence of keys
-                key_user = ['escape', key_user.replace(alt,'')]
-                break
+        key_user = _parse_key_user(key_user)
 
         if   type(key_user) == str  and\
              key_user in ALL_KEYS: # exists and   valid  → use it
