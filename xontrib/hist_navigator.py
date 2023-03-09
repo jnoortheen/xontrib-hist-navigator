@@ -85,6 +85,13 @@ def listd():
     print(XSH_DIRS_HISTORY.history)
 
 
+def _is_ptk():
+    if envx.get('SHELL_TYPE') in ["prompt_toolkit", "prompt_toolkit2"]:
+        return True
+    else:
+        return False
+
+
 def _p_msg_fmt(s):
     return tokenize_ansi(PygmentsTokens(partial_color_tokenize(XSH.shell.shell.prompt_formatter(s)))) # noqa
 
