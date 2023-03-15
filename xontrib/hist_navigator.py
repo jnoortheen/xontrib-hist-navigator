@@ -1,6 +1,9 @@
+import re
 from prompt_toolkit.filters import Condition
 from xonsh.built_ins import XSH
+from prompt_toolkit.keys import ALL_KEYS
 
+envx = XSH.env or {}
 
 class _DirsHistory:
     def __init__(self):
@@ -92,19 +95,80 @@ def insert_text(event, text):
 
 @XSH.builtins.events.on_ptk_create  # noqa
 def custom_keybindings(bindings, **_):
-    handler = bindings.add
+    from prompt_toolkit.key_binding.key_bindings import _parse_key
 
-    @handler("escape", "left", filter=cmd_empty_prompt)
+    re_despace = re.compile(r'\s', re.IGNORECASE)
+
+    _default_keys = {
+        "X_HISTNAV_KEY_PREV" : ['escape','left' ],
+        "X_HISTNAV_KEY_NEXT" : ['escape','right'],
+        "X_HISTNAV_KEY_UP"   : ['escape','up'   ],
+    }
+
+    _key_symb = {
+        '⎈':'c-'  ,'⌃':'c-'   ,
+        '▼':'down' ,'↓':'down' ,
+        '▲':'up'   ,'↑':'up'   ,
+        '◀':'left' ,'←':'left' ,
+        '▶':'right','→':'right',
+    }
+    _alts = ['a-','⌥','⎇']
+
+    def handler(key_user_var, filter):
+        def skip(func):
+          pass
+
+        if envx.get('SHELL_TYPE') in ["prompt_toolkit", "prompt_toolkit2"]:
+            bind_add = bindings.add
+        else:
+            bind_add = bindings.registry.add_binding
+
+        key_user = envx.get(     key_user_var, None)
+        key_def  = _default_keys[key_user_var]
+        if   key_user == None:     # doesn't exist       → use default
+            if type(key_def) == list:
+                return bind_add(*key_def, filter=filter)
+            else:
+                return bind_add( key_def, filter=filter)
+        elif key_user == False:    # exists and disabled → don't bind
+            return skip
+        elif type(key_user) == str:# remove whitespace
+            key_user = re_despace.sub('',key_user)
+
+        for k,v in _key_symb.items(): # replace symbols
+            if k in key_user: # replace other keys
+                key_user = key_user.replace(k,v)
+                break
+        for alt in _alts:
+            if alt in key_user: # replace alt with an ⎋ sequence of keys
+                key_user = ['escape', key_user.replace(alt,'')]
+                break
+
+        if   type(key_user) == str  and\
+             key_user in ALL_KEYS: # exists and   valid  → use it
+            return bind_add(key_user, filter=filter)
+        elif type(key_user) == list and\
+            all(k in ALL_KEYS or _parse_key(k) for k in key_user):
+            return bind_add(*key_user, filter=filter)
+        else:                      # exists and invalid  → use default
+            print_color("{BLUE}xontrib-hist_navigator:{RESET} your "+key_user_var+" '{BLUE}"+str(key_user)+"{RESET}' is {RED}invalid{RESET}; "+\
+              "using the default '{BLUE}"+str(key_def)+"{RESET}'; run ↓ to see the allowed list\nfrom prompt_toolkit.keys import ALL_KEYS; print(ALL_KEYS)")
+            if type(key_def) == list:
+                return bind_add(*key_def, filter=filter)
+            else:
+                return bind_add( key_def, filter=filter)
+
+    @handler("X_HISTNAV_KEY_PREV", filter=cmd_empty_prompt)
     def bind_prevd(event):
         """Equivalent to typing `prevd<enter>`"""
         insert_text(event, "prevd")
 
-    @handler("escape", "right", filter=cmd_empty_prompt)
+    @handler("X_HISTNAV_KEY_NEXT", filter=cmd_empty_prompt)
     def bind_nextd(event):
         """Equivalent to typing `nextd<enter>`"""
         insert_text(event, "nextd")
 
-    @handler("escape", "up", filter=cmd_empty_prompt)
+    @handler("X_HISTNAV_KEY_UP", filter=cmd_empty_prompt)
     def execute_version(event):
         """cd to parent directory"""
         insert_text(event, "cd ..")
