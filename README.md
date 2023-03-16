@@ -36,6 +36,5 @@ xontrib load hist_navigator
 # Release
 
 ```sh
-poetry version
-poetry publish
+semantic-release --patch # or --minor/--major
 ```
