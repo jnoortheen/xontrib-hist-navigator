@@ -83,7 +83,7 @@ def cmd_empty_prompt():
 
 
 def insert_text(event, text):
-    from xonsh.ptk_shell.key_bindings import carriage_return
+    from xonsh.shells.ptk_shell.key_bindings import carriage_return
 
     b = event.current_buffer
     b.insert_text(text)
