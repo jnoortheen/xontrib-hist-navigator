@@ -1,5 +1,11 @@
+from configparser import ConfigParser
+
 from prompt_toolkit.filters import Condition
 from xonsh.built_ins import XSH
+
+
+def is_truthy(s: str) -> bool:
+    return ConfigParser.BOOLEAN_STATES.get(s.lower(), False)
 
 
 class _DirsHistory:
@@ -13,19 +19,36 @@ class _DirsHistory:
             return  # do not add same item twice in the stack
         self.history.append(item)
 
+    @property
+    def cursor_left(self):
+        return max(self.cursor - 1, 0)
+
+    @property
+    def cursor_right(self):
+        return min(self.cursor + 1, len(self.history) - 1)
+
     def add(self, old: str, new: str):
         if not self.moved:
             if not self.history:
                 self._append(old)
+            else:
+                if new == self.history[self.cursor_left]:
+                    return self.prev()
+                if new == self.history[self.cursor_right]:
+                    return self.next()
+
+                should_truncate = XSH.env.get("XONTRIB_HIST_NAVIGATOR_TRUNCATE", "0")
+                if is_truthy(should_truncate):
+                    self.history = self.history[: self.cursor + 1]
             self._append(new)
             self.cursor = len(self.history) - 1
 
     def prev(self):
-        self.cursor = max(self.cursor - 1, 0)
+        self.cursor = self.cursor_left
         self._move()
 
     def next(self):
-        self.cursor = min(self.cursor + 1, len(self.history) - 1)
+        self.cursor = self.cursor_right
         self._move()
 
     def _move(self):
