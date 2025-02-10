@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v1.0.1 (2025-02-10)
+
+### Continuous Integration
+
+- Add release action on tag push
+  ([`9dcf93a`](https://github.com/jnoortheen/xontrib-hist-navigator/commit/9dcf93a8e458f05897a2ad645e327851fcd57544))
+
+### Documentation
+
+- Update readme
+  ([`a9c4a49`](https://github.com/jnoortheen/xontrib-hist-navigator/commit/a9c4a49bae12c630aaedcca8be61dfc07e211801))
+
+
 ## v1.0.0 (2025-02-10)
 
 ### Bug Fixes
