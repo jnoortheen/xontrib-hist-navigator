@@ -132,5 +132,5 @@ the last visited directory at the time of changing the directory to
 # Release
 
 ```sh
-semantic-release --patch # or --minor/--major
+semantic-release version && semantic-release publish
 ```
