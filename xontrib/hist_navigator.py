@@ -37,9 +37,9 @@ class _DirsHistory:
                 if new == self.history[self.cursor_right]:
                     return self.next()
 
-                should_truncate = XSH.env.get('XONTRIB_HIST_NAVIGATOR_TRUNCATE', '0')
+                should_truncate = XSH.env.get("XONTRIB_HIST_NAVIGATOR_TRUNCATE", "0")
                 if is_truthy(should_truncate):
-                    self.history = self.history[:self.cursor+1]
+                    self.history = self.history[: self.cursor + 1]
             self._append(new)
             self.cursor = len(self.history) - 1
 
