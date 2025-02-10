@@ -43,6 +43,6 @@ repository = "https://github.com/jnoortheen/xontrib-hist-navigator"
 
 
 [tool.semantic_release]
-version_toml = "pyproject.toml:project.version"
+version_toml = ["pyproject.toml:project.version"]
 version_source = "tag"
 build_command = "python -m build"
