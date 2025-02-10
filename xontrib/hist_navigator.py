@@ -1,5 +1,11 @@
+from configparser import ConfigParser
+
 from prompt_toolkit.filters import Condition
 from xonsh.built_ins import XSH
+
+
+def is_truthy(s: str) -> bool:
+    return ConfigParser.BOOLEAN_STATES.get(s.lower(), False)
 
 
 class _DirsHistory:
@@ -30,7 +36,10 @@ class _DirsHistory:
                     return self.prev()
                 if new == self.history[self.cursor_right]:
                     return self.next()
-                self.history = self.history[:self.cursor+1]
+
+                should_truncate = XSH.env.get('XONTRIB_HIST_NAVIGATOR_TRUNCATE', '0')
+                if is_truthy(should_truncate):
+                    self.history = self.history[:self.cursor+1]
             self._append(new)
             self.cursor = len(self.history) - 1
 
